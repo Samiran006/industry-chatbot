@@ -1,0 +1,18 @@
+# Virtual Environment
+venv/
+
+# Secrets
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+
+# Vector Store
+vector_store/
