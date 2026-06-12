@@ -1,10 +1,16 @@
-Industry Chatbot is an AI-powered customer support assistant.
+Company Name: Industry Chatbot
 
 Working Hours:
-Monday-Friday: 9 AM - 6 PM
+Monday-Friday: 9 AM to 6 PM
 
 Support Email:
 support@industrychatbot.com
 
 Refund Policy:
-Customers can request refunds within 30 days.
+Customers may request a refund within 30 days of purchase.
+
+Services:
+AI Chatbot Development
+RAG Implementation
+LLM Integration
+Customer Support Automation

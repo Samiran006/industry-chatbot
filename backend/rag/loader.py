@@ -6,6 +6,4 @@ def load_documents():
         "knowledge_base/company_faq.txt"
     )
 
-    docs = loader.load()
-
-    return docs
+    return loader.load()

@@ -1,14 +1,12 @@
 from langchain_community.vectorstores import FAISS
 
-def create_vector_store(chunks, embeddings):
+def build_vector_store(chunks, embeddings):
 
-    vector_db = FAISS.from_documents(
+    db = FAISS.from_documents(
         chunks,
         embeddings
     )
 
-    vector_db.save_local(
-        "vector_store"
-    )
+    db.save_local("vector_store")
 
-    return vector_db
+    return db
