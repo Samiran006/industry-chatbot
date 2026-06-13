@@ -1,0 +1,5 @@
+Pricing Plans
+
+Starter: $99/month
+Business: $299/month
+Enterprise: Custom Pricing

@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
 from backend.rag.retriever import get_retriever
-
+from backend.memory.chat_memory import (
+    add_message,
+    get_history
+)
 load_dotenv()
 
 llm = ChatGroq(
@@ -23,16 +26,42 @@ def ask_llm(question):
         [doc.page_content for doc in docs]
     )
 
+    history = get_history()
+
+    history_text = ""
+
+    for msg in history:
+        history_text += (
+            f"{msg['role']}: "
+            f"{msg['content']}\n"
+        )
+
     prompt = f"""
-Answer the question using only the context below.
+You are an intelligent customer support assistant.
+
+Use:
+1. Conversation history
+2. Retrieved context
+
+Conversation History:
+{history_text}
 
 Context:
 {context}
 
 Question:
 {question}
+
+Answer naturally and accurately.
 """
 
     response = llm.invoke(prompt)
+
+    add_message("User", question)
+
+    add_message(
+        "Assistant",
+        response.content
+    )
 
     return response.content

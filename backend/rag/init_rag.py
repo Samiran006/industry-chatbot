@@ -3,15 +3,21 @@ from backend.rag.chunker import split_documents
 from backend.rag.embeddings import get_embeddings
 from backend.rag.vector_store import build_vector_store
 
-docs = load_all_documents()
 
-chunks = split_documents(docs)
+def create_vector_store():
+    docs = load_all_documents()
 
-embeddings = get_embeddings()
+    chunks = split_documents(docs)
 
-build_vector_store(
-    chunks,
-    embeddings
-)
+    embeddings = get_embeddings()
 
-print("Vector Store Created Successfully")
+    build_vector_store(
+        chunks,
+        embeddings
+    )
+
+    print("Vector Store Created Successfully")
+
+
+if __name__ == "__main__":
+    create_vector_store()
