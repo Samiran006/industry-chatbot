@@ -23,46 +23,86 @@ def load_all_documents():
         "csvs": "knowledge_base/csvs"
     }
 
-    # PDFs
+    # ==========================
+    # PDF FILES
+    # ==========================
+
     for file in os.listdir(folders["pdfs"]):
 
         if file.endswith(".pdf"):
 
             loader = PyPDFLoader(
-                os.path.join(folders["pdfs"], file)
+                os.path.join(
+                    folders["pdfs"],
+                    file
+                )
             )
 
-            documents.extend(loader.load())
+            docs = loader.load()
 
-    # TXT
+            for doc in docs:
+                doc.metadata["source"] = file
+
+            documents.extend(docs)
+
+    # ==========================
+    # TXT FILES
+    # ==========================
+
     for file in os.listdir(folders["txt"]):
 
         if file.endswith(".txt"):
 
             loader = TextLoader(
-                os.path.join(folders["txt"], file)
+                os.path.join(
+                    folders["txt"],
+                    file
+                )
             )
 
-            documents.extend(loader.load())
+            docs = loader.load()
 
-    # DOCX
+            for doc in docs:
+                doc.metadata["source"] = file
+
+            documents.extend(docs)
+
+    # ==========================
+    # DOCX FILES
+    # ==========================
+
     for file in os.listdir(folders["docx"]):
 
         if file.endswith(".docx"):
 
             loader = Docx2txtLoader(
-                os.path.join(folders["docx"], file)
+                os.path.join(
+                    folders["docx"],
+                    file
+                )
             )
 
-            documents.extend(loader.load())
+            docs = loader.load()
 
-    # JSON
+            for doc in docs:
+                doc.metadata["source"] = file
+
+            documents.extend(docs)
+
+    # ==========================
+    # JSON FILES
+    # ==========================
+
     for file in os.listdir(folders["jsons"]):
 
         if file.endswith(".json"):
 
             with open(
-                os.path.join(folders["jsons"], file),
+                os.path.join(
+                    folders["jsons"],
+                    file
+                ),
+                "r",
                 encoding="utf-8"
             ) as f:
 
@@ -73,11 +113,17 @@ def load_all_documents():
                         page_content=json.dumps(
                             data,
                             indent=2
-                        )
+                        ),
+                        metadata={
+                            "source": file
+                        }
                     )
                 )
 
-    # CSV
+    # ==========================
+    # CSV FILES
+    # ==========================
+
     for file in os.listdir(folders["csvs"]):
 
         if file.endswith(".csv"):
@@ -91,8 +137,18 @@ def load_all_documents():
 
             documents.append(
                 Document(
-                    page_content=df.to_string()
+                    page_content=df.to_string(),
+                    metadata={
+                        "source": file
+                    }
                 )
             )
+
+    print("\n========== DOCUMENTS LOADED ==========")
+
+    for doc in documents:
+        print(doc.metadata)
+
+    print("======================================\n")
 
     return documents

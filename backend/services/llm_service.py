@@ -8,6 +8,7 @@ from backend.memory.chat_memory import (
     add_message,
     get_history
 )
+
 load_dotenv()
 
 llm = ChatGroq(
@@ -18,13 +19,27 @@ llm = ChatGroq(
 
 retriever = get_retriever()
 
+
 def ask_llm(question):
 
     docs = retriever.invoke(question)
 
-    context = "\n".join(
-        [doc.page_content for doc in docs]
-    )
+    sources = []
+
+    for doc in docs:
+        source = doc.metadata.get(
+            "source",
+            "Unknown"
+        )
+        sources.append(source)
+
+    context = ""
+
+    for doc in docs:
+        context += (
+            doc.page_content +
+            "\n\n"
+        )
 
     history = get_history()
 
@@ -64,4 +79,17 @@ Answer naturally and accurately.
         response.content
     )
 
-    return response.content
+    unique_sources = list(
+        set(sources)
+    )
+
+    source_text = "\n".join(
+        unique_sources
+    )
+
+    final_answer = (
+        f"{response.content}\n\n"
+        f"Sources:\n{source_text}"
+    )
+
+    return final_answer
