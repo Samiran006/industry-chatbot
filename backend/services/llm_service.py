@@ -17,11 +17,10 @@ llm = ChatGroq(
     temperature=0.3
 )
 
-retriever = get_retriever()
 
 
 def ask_llm(question):
-
+    retriever = get_retriever()
     docs = retriever.invoke(question)
 
     sources = []
