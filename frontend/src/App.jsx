@@ -1,5 +1,6 @@
 import { useState } from "react";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import WebsiteInput from "./components/WebsiteInput";
@@ -33,7 +34,10 @@ function App() {
         />
 
       </div>
-
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+      />
     </div>
   );
 }

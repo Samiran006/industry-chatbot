@@ -1,11 +1,14 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { toast } from "react-toastify";
 
 export default function UploadPanel() {
   const [status, setStatus] = useState("");
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    if (!acceptedFiles.length) return;
+    if (!acceptedFiles || acceptedFiles.length === 0) {
+      return;
+    }
 
     const file = acceptedFiles[0];
 
@@ -25,9 +28,14 @@ export default function UploadPanel() {
 
       const data = await response.json();
 
+      toast.success(data.message);
+
       setStatus(data.message);
     } catch (error) {
-      console.error(error);
+      console.error("Upload Error:", error);
+
+      toast.error("Upload failed");
+
       setStatus("Upload failed");
     }
   }, []);
@@ -68,7 +76,7 @@ export default function UploadPanel() {
         </div>
 
         <p className="font-semibold text-slate-200">
-          Drop file here
+          Drag & Drop File Here
         </p>
 
         <p className="text-sm text-slate-400 mt-1">
@@ -89,7 +97,7 @@ export default function UploadPanel() {
             py-2
             rounded-lg
             ${
-              status.includes("failed")
+              status.toLowerCase().includes("failed")
                 ? "bg-red-900 text-red-200"
                 : "bg-green-900 text-green-200"
             }

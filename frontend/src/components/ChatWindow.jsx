@@ -1,29 +1,30 @@
 import { useState, useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
+import PromptCards from "./PromptCards";
 import { sendMessage } from "../services/api";
-
+import LoadingDots from "./LoadingDots";
 export default function ChatWindow() {
 
   const [messages, setMessages] = useState(() => {
 
-  try {
+    try {
 
-    const saved =
-      localStorage.getItem(
-        "chat_history"
-      );
+      const saved =
+        localStorage.getItem(
+          "chat_history"
+        );
 
-    return saved
-      ? JSON.parse(saved)
-      : [];
+      return saved
+        ? JSON.parse(saved)
+        : [];
 
-  } catch {
+    } catch {
 
-    return [];
+      return [];
 
-  }
+    }
 
-});
+  });
 
   const [input, setInput] = useState("");
 
@@ -31,26 +32,29 @@ export default function ChatWindow() {
 
   const messagesEndRef = useRef(null);
 
-  // Save chat history
   useEffect(() => {
+
     localStorage.setItem(
       "chat_history",
       JSON.stringify(messages)
     );
+
   }, [messages]);
 
-  // Auto-scroll
   useEffect(() => {
+
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
+
   }, [messages, loading]);
 
-  const handleSend = async () => {
+  const handleSend = async (customPrompt = null) => {
 
-    if (!input.trim()) return;
+    const userMessage =
+      customPrompt || input;
 
-    const userMessage = input;
+    if (!userMessage.trim()) return;
 
     setMessages((prev) => [
       ...prev,
@@ -66,9 +70,10 @@ export default function ChatWindow() {
 
     try {
 
-      const answer = await sendMessage(
-        userMessage
-      );
+      const answer =
+        await sendMessage(
+          userMessage
+        );
 
       setMessages((prev) => [
         ...prev,
@@ -101,6 +106,14 @@ export default function ChatWindow() {
     }
   };
 
+  const handlePromptClick = (
+    prompt
+  ) => {
+
+    handleSend(prompt);
+
+  };
+
   const handleKeyDown = (e) => {
 
     if (e.key === "Enter") {
@@ -116,16 +129,24 @@ export default function ChatWindow() {
 
         {messages.length === 0 && (
           <div className="text-center text-gray-500 mt-20">
-            <h2 className="text-2xl font-bold mb-2">
+
+            <h2 className="text-3xl font-bold mb-3 text-gray-800">
               Industry AI Chatbot
             </h2>
 
-            <p>
+            <p className="mb-6">
               Ask anything about your
-              documents, website,
-              services, pricing,
+              documents, websites,
+              pricing, services,
               support, and more.
             </p>
+
+            <PromptCards
+              onSelect={
+                handlePromptClick
+              }
+            />
+
           </div>
         )}
 
@@ -140,12 +161,20 @@ export default function ChatWindow() {
         )}
 
         {loading && (
-          <div className="my-3">
-            <div className="inline-block bg-white border border-gray-300 px-4 py-2 rounded-xl shadow-sm text-black">
-              🤖 Thinking...
+         <div className="my-4 flex justify-start">
+
+            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm">
+
+              <div className="text-xs font-semibold text-blue-600 mb-2">
+                🤖 Industry AI
+              </div>
+
+            <LoadingDots />
+
             </div>
+
           </div>
-        )}
+       )}
 
         <div ref={messagesEndRef} />
 
@@ -181,7 +210,9 @@ export default function ChatWindow() {
           />
 
           <button
-            onClick={handleSend}
+            onClick={() =>
+              handleSend()
+            }
             className="
               bg-blue-600
               hover:bg-blue-700

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ingestWebsite } from "../services/websiteApi";
-
+import { toast } from "react-toastify";
 function WebsiteInput() {
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState("");
@@ -13,10 +13,12 @@ function WebsiteInput() {
 
       const result = await ingestWebsite(url);
 
+      toast.success(result.message);
       setStatus(result.message);
 
       setUrl("");
     } catch (error) {
+      toast.error("Failed to index website");
       setStatus("Failed to index website");
       console.error(error);
     }
