@@ -16,3 +16,10 @@ logs/
 
 # Vector Store
 vector_store/
+
+# Frontend
+node_modules/
+dist/
+
+# OS Files
+.DS_Store
