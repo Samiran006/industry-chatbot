@@ -3,6 +3,9 @@ import MessageBubble from "./MessageBubble";
 import PromptCards from "./PromptCards";
 import { sendMessage } from "../services/api";
 import LoadingDots from "./LoadingDots";
+import ExportChatButton from "./ExportChatButton";
+import { typeWriter } from "../utils/typewriter";
+
 export default function ChatWindow() {
 
   const [messages, setMessages] = useState(() => {
@@ -75,13 +78,54 @@ export default function ChatWindow() {
           userMessage
         );
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: answer,
+      let botMessageIndex;
+
+      setMessages((prev) => {
+
+        botMessageIndex =
+          prev.length;
+
+        return [
+          ...prev,
+          {
+            sender: "bot",
+            text: "",
+          },
+        ];
+
+      });
+
+      await typeWriter(
+        answer,
+        (currentText) => {
+
+          setMessages((prev) => {
+
+            const updated =
+              [...prev];
+
+            if (
+              updated[
+                botMessageIndex
+              ]
+            ) {
+
+              updated[
+                botMessageIndex
+              ] = {
+                sender: "bot",
+                text: currentText,
+              };
+
+            }
+
+            return updated;
+
+          });
+
         },
-      ]);
+        5
+      );
 
     } catch (error) {
 
@@ -117,7 +161,9 @@ export default function ChatWindow() {
   const handleKeyDown = (e) => {
 
     if (e.key === "Enter") {
+
       handleSend();
+
     }
 
   };
@@ -125,9 +171,18 @@ export default function ChatWindow() {
   return (
     <div className="flex flex-col flex-1 bg-white rounded-xl overflow-hidden shadow">
 
+      <div className="p-4 border-b bg-gray-50 flex justify-end">
+
+        <ExportChatButton
+          messages={messages}
+        />
+
+      </div>
+
       <div className="flex-1 overflow-y-auto p-6">
 
         {messages.length === 0 && (
+
           <div className="text-center text-gray-500 mt-20">
 
             <h2 className="text-3xl font-bold mb-3 text-gray-800">
@@ -148,20 +203,24 @@ export default function ChatWindow() {
             />
 
           </div>
+
         )}
 
         {messages.map(
           (msg, index) => (
+
             <MessageBubble
               key={index}
               message={msg.text}
               sender={msg.sender}
             />
+
           )
         )}
 
         {loading && (
-         <div className="my-4 flex justify-start">
+
+          <div className="my-4 flex justify-start">
 
             <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm">
 
@@ -169,12 +228,13 @@ export default function ChatWindow() {
                 🤖 Industry AI
               </div>
 
-            <LoadingDots />
+              <LoadingDots />
 
             </div>
 
           </div>
-       )}
+
+        )}
 
         <div ref={messagesEndRef} />
 

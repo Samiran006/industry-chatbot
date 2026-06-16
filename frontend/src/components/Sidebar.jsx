@@ -4,6 +4,11 @@ import UploadPanel from "./UploadPanel";
 export default function Sidebar({
   clearChat,
 }) {
+
+  const messageCount = JSON.parse(
+    localStorage.getItem("chat_history") || "[]"
+  ).length;
+
   return (
     <div className="w-72 bg-slate-900 text-white p-4 flex flex-col border-r border-slate-700">
 
@@ -43,8 +48,20 @@ export default function Sidebar({
 
       </div>
 
+      <div className="mt-6">
+
+        <h3 className="text-sm font-semibold text-slate-300 mb-2">
+          Conversation Stats
+        </h3>
+
+        <div className="bg-slate-800 rounded-lg p-3 text-sm text-slate-400">
+          {messageCount} messages
+        </div>
+
+      </div>
+
       <div className="mt-auto pt-6 text-xs text-slate-500">
-        Phase 9 UI
+        Phase 11.4 • Session Management
       </div>
 
     </div>

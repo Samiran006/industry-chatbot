@@ -1,6 +1,9 @@
 from langchain_community.vectorstores import FAISS
 
-from backend.rag.embeddings import get_embeddings
+from backend.rag.embeddings import (
+    get_embeddings
+)
+
 
 def get_retriever():
 
@@ -10,6 +13,11 @@ def get_retriever():
         allow_dangerous_deserialization=True
     )
 
-    return db.as_retriever(
-        search_kwargs={"k": 3}
+    retriever = db.as_retriever(
+        search_type="similarity",
+        search_kwargs={
+            "k": 5
+        }
     )
+
+    return retriever

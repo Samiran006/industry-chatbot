@@ -17,24 +17,28 @@ llm = ChatGroq(
     temperature=0.3
 )
 
+retriever = get_retriever()
 
 
 def ask_llm(question):
-    retriever = get_retriever()
+
     docs = retriever.invoke(question)
 
     sources = []
 
     for doc in docs:
+
         source = doc.metadata.get(
             "source",
             "Unknown"
         )
+
         sources.append(source)
 
     context = ""
 
     for doc in docs:
+
         context += (
             doc.page_content +
             "\n\n"
@@ -45,17 +49,23 @@ def ask_llm(question):
     history_text = ""
 
     for msg in history:
+
         history_text += (
             f"{msg['role']}: "
             f"{msg['content']}\n"
         )
 
     prompt = f"""
-You are an intelligent customer support assistant.
+You are an intelligent Industry AI assistant.
 
-Use:
-1. Conversation history
-2. Retrieved context
+Rules:
+- Use the provided context first.
+- Use conversation history when relevant.
+- If the answer is not present in the context, clearly say so.
+- Do not invent information.
+- Keep answers professional and concise.
+- Mention relevant details from retrieved sources.
+- Answer in a helpful customer-support style.
 
 Conversation History:
 {history_text}
@@ -66,12 +76,15 @@ Context:
 Question:
 {question}
 
-Answer naturally and accurately.
+Answer:
 """
 
     response = llm.invoke(prompt)
 
-    add_message("User", question)
+    add_message(
+        "User",
+        question
+    )
 
     add_message(
         "Assistant",
@@ -82,12 +95,29 @@ Answer naturally and accurately.
         set(sources)
     )
 
+    source_count = len(
+        unique_sources
+    )
+
+    if source_count >= 3:
+
+        confidence = "High"
+
+    elif source_count >= 2:
+
+        confidence = "Medium"
+
+    else:
+
+        confidence = "Low"
+
     source_text = "\n".join(
         unique_sources
     )
 
     final_answer = (
         f"{response.content}\n\n"
+        f"Confidence: {confidence}\n\n"
         f"Sources:\n{source_text}"
     )
 
