@@ -1,18 +1,15 @@
-from langchain_huggingface import HuggingFaceEmbeddings
+import os
 
-_embeddings = None
+from dotenv import load_dotenv
+
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+load_dotenv()
 
 
 def get_embeddings():
-    global _embeddings
 
-    if _embeddings is None:
-        print("Loading embeddings model...")
-
-        _embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
-
-        print("Embeddings loaded.")
-
-    return _embeddings
+    return GoogleGenerativeAIEmbeddings(
+        model="models/gemini-embedding-001",
+        google_api_key=os.getenv("GOOGLE_API_KEY")
+    )

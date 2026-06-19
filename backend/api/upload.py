@@ -2,8 +2,6 @@ from fastapi import APIRouter, UploadFile, File
 import shutil
 import os
 
-from backend.rag.init_rag import create_vector_store
-
 router = APIRouter()
 
 
@@ -53,9 +51,7 @@ async def upload_file(
             buffer
         )
 
-    #create_vector_store()
-
     return {
-        "message":
-        f"{file.filename} uploaded and indexed successfully"
-    }
+     "message":
+     f"{file.filename} uploaded successfully"
+   }

@@ -14,8 +14,6 @@ __pycache__/
 # Logs
 logs/
 
-# Vector Store
-vector_store/
 
 # Frontend
 node_modules/
