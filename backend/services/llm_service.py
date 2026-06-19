@@ -17,10 +17,24 @@ llm = ChatGroq(
     temperature=0.3
 )
 
-retriever = get_retriever()
+# Lazy-loaded retriever
+_retriever = None
+
+
+def get_cached_retriever():
+    global _retriever
+
+    if _retriever is None:
+        print("Loading retriever...")
+        _retriever = get_retriever()
+        print("Retriever loaded successfully.")
+
+    return _retriever
 
 
 def ask_llm(question):
+
+    retriever = get_cached_retriever()
 
     docs = retriever.invoke(question)
 
@@ -100,15 +114,10 @@ Answer:
     )
 
     if source_count >= 3:
-
         confidence = "High"
-
     elif source_count >= 2:
-
         confidence = "Medium"
-
     else:
-
         confidence = "Low"
 
     source_text = "\n".join(
