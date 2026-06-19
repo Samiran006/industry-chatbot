@@ -53,7 +53,7 @@ async def upload_file(
             buffer
         )
 
-    create_vector_store()
+    #create_vector_store()
 
     return {
         "message":
