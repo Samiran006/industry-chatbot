@@ -1,13 +1,11 @@
 import os
+from functools import lru_cache
 
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
 from backend.rag.retriever import get_retriever
-from backend.memory.chat_memory import (
-    add_message,
-    get_history
-)
+from backend.memory.chat_memory import add_message, get_history
 
 load_dotenv()
 
@@ -17,69 +15,49 @@ llm = ChatGroq(
     temperature=0.3
 )
 
-# Lazy-loaded retriever
-_retriever = None
-
-
+@lru_cache(maxsize=1)
 def get_cached_retriever():
-    global _retriever
-
-    if _retriever is None:
-        print("Loading retriever...")
-        _retriever = get_retriever()
-        print("Retriever loaded successfully.")
-
-    return _retriever
+    print("Loading retriever...")
+    retriever = get_retriever()
+    print("Retriever loaded successfully.")
+    return retriever
 
 
 def ask_llm(question):
+    try:
+        retriever = get_cached_retriever()
+        docs = retriever.invoke(question)
+        sources = []
 
-    retriever = get_cached_retriever()
+        for doc in docs:
+            source = doc.metadata.get("source", "Unknown")
+            sources.append(source)
 
-    docs = retriever.invoke(question)
-
-    sources = []
-
-    for doc in docs:
-
-        source = doc.metadata.get(
-            "source",
-            "Unknown"
-        )
-
-        sources.append(source)
-
-    context = ""
-
-    for doc in docs:
-
-        context += (
-            doc.page_content +
-            "\n\n"
-        )
+        context = "\n\n".join(doc.page_content for doc in docs)
+    except Exception as e:
+        print(f"Retriever Error: {e}")
+        docs = []
+        sources = []
+        context = ""
 
     history = get_history()
-
     history_text = ""
 
     for msg in history:
-
-        history_text += (
-            f"{msg['role']}: "
-            f"{msg['content']}\n"
-        )
+        history_text += f"{msg['role']}: {msg['content']}\n"
 
     prompt = f"""
 You are an intelligent Industry AI assistant.
 
 Rules:
-- Use the provided context first.
-- Use conversation history when relevant.
-- If the answer is not present in the context, clearly say so.
-- Do not invent information.
-- Keep answers professional and concise.
-- Mention relevant details from retrieved sources.
-- Answer in a helpful customer-support style.
+
+* Use the provided context first.
+* Use conversation history when relevant.
+* If the answer is not present in the context, clearly say so.
+* Do not invent information.
+* Keep answers professional and concise.
+* Mention relevant details from retrieved sources when available.
+* Answer in a helpful customer-support style.
 
 Conversation History:
 {history_text}
@@ -95,34 +73,22 @@ Answer:
 
     response = llm.invoke(prompt)
 
-    add_message(
-        "User",
-        question
-    )
+    add_message("User", question)
+    add_message("Assistant", response.content)
 
-    add_message(
-        "Assistant",
-        response.content
-    )
-
-    unique_sources = list(
-        set(sources)
-    )
-
-    source_count = len(
-        unique_sources
-    )
+    unique_sources = list(set(sources))
+    source_count = len(unique_sources)
 
     if source_count >= 3:
         confidence = "High"
     elif source_count >= 2:
         confidence = "Medium"
-    else:
+    elif source_count == 1:
         confidence = "Low"
+    else:
+        confidence = "No Sources"
 
-    source_text = "\n".join(
-        unique_sources
-    )
+    source_text = "\n".join(unique_sources) if unique_sources else "No sources available"
 
     final_answer = (
         f"{response.content}\n\n"
