@@ -229,11 +229,15 @@ uvicorn backend.main:app --reload
 
 Backend URL:
 
+```text
 http://127.0.0.1:8000
+```
 
 Swagger Documentation:
 
+```text
 http://127.0.0.1:8000/docs
+```
 
 ---
 
@@ -259,7 +263,9 @@ npm run dev
 
 Frontend URL:
 
+```text
 http://localhost:5173
+```
 
 ---
 
