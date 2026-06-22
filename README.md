@@ -71,6 +71,7 @@ https://github.com/Samiran006/industry-chatbot
 
 # Architecture
 
+```text
 User
  │
  ▼
@@ -91,6 +92,7 @@ FastAPI Backend (Render)
  │
  ▼
 Generated Response
+```
 
 ---
 
@@ -149,6 +151,7 @@ Generated Response
 
 # Project Structure
 
+```text
 industry-chatbot/
 
 ├── backend/
@@ -174,6 +177,7 @@ industry-chatbot/
 ├── .env.example
 ├── .gitignore
 └── README.md
+```
 
 ---
 
@@ -263,15 +267,21 @@ http://localhost:5173
 
 ## Chat
 
+```http
 GET /chat
+```
 
 ## Upload Documents
 
+```http
 POST /upload
+```
 
 ## Website Ingestion
 
+```http
 POST /ingest-website
+```
 
 ---
 
